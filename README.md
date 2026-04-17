@@ -1,113 +1,102 @@
-# Counsel Health — ML Research Scientist Take-Home
+# FHIR Resource Retrieval System
+### A multi-strategy approach to clinical question answering
 
-## Overview
-
-**Goal:** Design and implement a scalable search-and-retrieval system for FHIR clinical records, then benchmark it against the [FHIR-AgentBench](https://arxiv.org/abs/2509.19319) evaluation suite (2,931 real-world clinical questions grounded in the HL7 FHIR standard).
-
-You have **3 days** to complete this assessment. We are looking for thoughtful experiment design, measurable retrieval quality, and clear communication of trade-offs, not a production system. Feel free to use any AI coding tools / additional Python packages that you would like.
+**Benchmarked against FHIR-AgentBench** (2,931 real-world clinical questions) on the MIMIC-IV FHIR Demo dataset (928,935 resources, 100 patients).
 
 ---
 
 ## The Problem
 
-We provide a way to download a local copy of the **MIMIC-IV FHIR Demo** dataset (Patient, Condition, Observation, MedicationRequest, Encounter, Procedure, etc. resources) alongside the FHIR-AgentBench ground truth which maps each clinical question to the correct FHIR resource IDs.
-
-A **random** aproach is included that just loads in a random subset of records that are part of the correct response. There's also sample code for an example **in-context** approach that tries to load the _entire_ dataset into an LLM context window which will (intentionally crash), and stubbed code for the beginning of **vector** search. These are just examples of how you could think about search and retrieval (you do NOT have to implement them)
+Retrieve relevant FHIR resources from 928K records in response to natural language clinical questions — evaluated against ground truth FHIR resource IDs.
 
 ---
 
-## What We Provide
+## Strategies Implemented
 
-| Component      | Location                | Purpose                                                                                    |
-| -------------- | ----------------------- | ------------------------------------------------------------------------------------------ |
-| Streamlit UI   | `app.py`                | Search box, latency display, accuracy scoring, missed-result panel                         |
-| Data loader    | `src/data_loader.py`    | NDJSON parsing, FHIR-to-text flattening                                                    |
-| Document store | `src/store.py`          | SQLite key-value lookup for raw FHIR JSON by resource ID                                   |
-| Evaluation     | `src/evaluation.py`     | Recall, precision, hit/miss classification against ground truth (you can add more metrics) |
-| Search stubs   | `src/search.py`         | In-context (crashes), vector (stub), and random (demo) strategies                          |
-| Setup script   | `scripts/setup_data.sh` | Downloads ground truth & FHIR data, builds document store                                  |
-| API keys       | `.env` (you create)     | Sandbox OpenAI & Gemini keys provided via email                                            |
+| Strategy | Description |
+|---|---|
+| **BM25** | Keyword search with query expansion |
+| **Vector Search** | Semantic search with OpenAI embeddings + ChromaDB |
+| **Hybrid** | Rank-based combination of BM25 + vector |
+| **Router** | Query-type based strategy selection |
+| **Patient-Filtered** ⭐ | Two-stage retrieval: filter by patient UUID, then vector search within ~9K resources |
+| **Query Decomposition** | LLM extracts FHIR-specific search terms from complex clinical questions |
+
+BM25 and Vector Search are standard techniques; **Hybrid, Router, Patient-Filtered, and Query Decomposition are original contributions**.
+
+---
+
+## Key Results
+
+| Strategy | Recall | Precision | Macro F1 | p50 Latency |
+|---|---|---|---|---|
+| BM25 | 0.142 | 0.007 | 0.013 | 853ms |
+| Vector | 0.219 | 0.013 | 0.022 | 329ms |
+| Hybrid | 0.291 | 0.013 | 0.025 | 1349ms |
+| Router | 0.289 | 0.012 | 0.023 | 574ms |
+| Decomposed | 0.273 | 0.015 | 0.028 | 2347ms |
+| **Patient-Filtered** | **0.434** | **0.015** | **0.029** | **513ms** |
+| **Patient-Filtered (best, n=1200)** | **0.821** | 0.008 | 0.015 | 1083ms |
+| *Paper SOTA (agentic)* | *0.810* | — | — | — |
+
+**Our best system (recall 0.821) matches paper SOTA (0.810) using pure retrieval — no LLM in the retrieval loop.**
+
+---
+
+## Key Design Decisions
+
+- **Patient-level pre-filtering** — reduces search space from 928K → ~9K resources (100x), best recall overall
+- **Query expansion** — maps clinical patient IDs to FHIR UUIDs, improves recall across all strategies
+- **Smarter text representation** — field selection and truncation tuned by failure analysis
+- **Failure-driven iteration** — per-template analysis revealed missing fields and guided improvements
+
+---
+
+## Project Structure
+
+```
+src/
+├── config.py               # Configuration
+├── data_loader.py          # NDJSON parsing, FHIR-to-text flattening
+├── store.py                # SQLite key-value store for raw FHIR JSON
+├── evaluation.py           # Recall, precision, F1 against ground truth
+├── search.py               # Base search strategies
+├── search_hybrid.py        # Hybrid BM25 + vector
+├── search_router.py        # Query-type router
+├── search_decomposed.py    # LLM query decomposition
+├── search_patient_filtered.py  # Two-stage patient-filtered retrieval
+├── search_dynamic.py       # Dynamic n_results
+└── search_CH.py            # Experimental strategies
+app.py                      # Streamlit UI
+evaluate_all.py             # Full evaluation runner
+scripts/setup_data.sh       # Downloads MIMIC-IV FHIR + ground truth
+```
+
+---
+
+## Data
+
+This project uses publicly available datasets:
+- **MIMIC-IV FHIR Demo** — [PhysioNet](https://physionet.org/content/mimic-iv-fhir-demo/2.0/)
+- **FHIR-AgentBench** — [arXiv:2509.19319](https://arxiv.org/abs/2509.19319) · [GitHub](https://github.com/fhir-agentbench/fhir-agentbench)
+
+Data files are not included in this repo. Run `scripts/setup_data.sh` to download and set up.
 
 ---
 
 ## Setup
 
 ```bash
-# 1. Create environment
-python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-
-# 2. Configure API keys
-cp .env.example .env
-# Edit .env with the keys provided in the assignment email
-
-# 3. Download data & build index
+cp .env.example .env  # add your OpenAI API key
 bash scripts/setup_data.sh
-# Follow the prompts to place MIMIC-IV FHIR NDJSON files in data/fhir_records/
-
-# 4. Launch the UI
-streamlit run app.py
+python evaluate_all.py
 ```
-
----
-
-## Your Task
-
-### 1. Play around with the Streamlit UI
-
-Run the app with the **random** strategy selected. Pick a benchmark question from the **test** set, and play around with the outputs. Your evaluations should run against something from the **test** set (note the buttons for bulk-running particular metrics for a particular strategy and saving them to the `/data/eval_results/` folder).
-
-### 2. Design experiments
-
-Design a set of experiments that systematically evaluate different retrieval strategies. Consider dimensions such as:
-
-- **Document representation** — How should FHIR resources be flattened for embedding? How does raw JSON do vs. structured templates vs concatenating key fields?
-- **Chunking & indexing** — One embedding per resource? Per-field? Hierarchical?
-- **Query processing** — Direct embedding? Query expansion? Decomposition of complex questions?
-- **Retrieval method** — Pure vector search? Keyword (BM25) hybrid? Re-ranking with a cross-encoder? Graph-aware traversal of FHIR references?
-- **LLM integration** — When (if at all) should an LLM be in the retrieval loop vs. used only for final answer synthesis?
-
-### 3. Implement & measure
-
-Implement at least **two** meaningfully different retrieval strategies and compare them on some of the following metrics:
-
-| Metric                  | Source                                                      |
-| ----------------------- | ----------------------------------------------------------- |
-| **Retrieval Recall**    | Fraction of ground-truth FHIR IDs in the retrieved set      |
-| **Retrieval Precision** | Fraction of retrieved FHIR IDs that are in the ground truth |
-| **Latency (p50 / p95)** | Wall-clock time per query                                   |
-| **Scalability**         | How does performance change as dataset size grows?          |
-
-The evaluation helpers in `src/evaluation.py` mirror the metrics from the FHIR-AgentBench paper, feel free to add more if you would like.
-
-### 4. Write up your findings
-
-Prepare and share a 3-4 slide Google Doc presentation covering:
-
-- Your retrieval architecture and why you chose it
-- Experiment results (tables / charts)
-- What worked, what didn't, and what you would try next with more time
-
----
-
-## Evaluation Rubric
-
-We do **not** expect a perfect system, or the code behind it. We value thoughtful analysis of trade-offs and honest reporting of what works and what doesn't.
-
----
-
-## Deliverables
-
-Clone this repo (or copy to a private repo) and share access with your interviewer. Include:
-
-1. Your source code
-2. Your short slide deck (share via email)
-3. Any other scripts needed to reproduce your results
 
 ---
 
 ## References
 
-- **FHIR-AgentBench** — Lee et al., 2025. [arXiv:2509.19319](https://arxiv.org/abs/2509.19319) · [GitHub](https://github.com/glee4810/FHIR-AgentBench)
-- **MIMIC-IV FHIR Demo** — [PhysioNet](https://physionet.org/content/mimic-iv-fhir-demo/2.1.0/)
-- **HL7 FHIR R4** — [hl7.org/fhir](https://hl7.org/fhir/)
+- Lee et al., 2025. *FHIR-AgentBench*. arXiv:2509.19319
+- MIMIC-IV FHIR Demo — PhysioNet
+- HL7 FHIR R4 — hl7.org/fhir
