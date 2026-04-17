@@ -1,0 +1,13 @@
+# Core (setup + UI)
+streamlit>=1.40.0
+pandas>=2.2.0
+numpy>=1.26.0
+python-dotenv>=1.0.0
+requests>=2.32.0
+tqdm>=4.66.0
+
+# LLM providers (sandbox keys provided)
+openai>=1.50.0
+google-generativeai>=0.8.0
+
+# Retrieval — add your own libraries as needed (e.g. chromadb, faiss, etc.)

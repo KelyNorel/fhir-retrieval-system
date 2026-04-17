@@ -1,0 +1,72 @@
+Loading BM25 index from disk...
+BM25 index loaded: 928,935 documents
+Patient ID map built: 100 patients
+
+=== Recall by Question Type ===
+                                                                 mean_recall  n_questions  mean_n_true_ids
+template                                                                                                  
+Count the number of times that patient {patient_id} received...     1.000000            4         1.000000
+Has_verb patient {patient_id} received a {procedure_name} pr...     1.000000            7         1.142857
+Has_verb patient {patient_id} had any {spec_name} microbiolo...     0.750000            4         9.250000
+What is the gender of patient {patient_id}?                         0.714286            7         1.000000
+Has_verb patient {patient_id} received a {lab_name} lab test...     0.500000            6         3.000000
+Count the number of times that patient {patient_id} had a {o...     0.480000            3        90.000000
+What was the [time_filter_exact1] measured value of a {lab_n...     0.428571            7         1.000000
+When was patient {patient_id}'s [time_filter_exact1] {spec_n...     0.428571            7         1.142857
+What was the [agg_function] {lab_name} value of patient {pat...     0.428571            7         5.000000
+When was the [time_filter_exact1] time that patient {patient...     0.272727           33         1.181818
+What is_verb the marital status of patient {patient_id} [tim...     0.142857            7         1.000000
+Has_verb patient {patient_id} been prescribed any medication...     0.005183            6       134.833333
+What was the name of the drug that patient {patient_id} was ...     0.000000           10         4.400000
+What was the [time_filter_exact1] measured height of patient...     0.000000            5         1.000000
+What was the [time_filter_exact1] measured weight of patient...     0.000000            7         1.000000
+What was the [time_filter_exact1] measured {vital_name} of p...     0.000000            6         1.000000
+What was the dose of {drug_name} that patient {patient_id} w...     0.000000            6         2.000000
+What was the total volume of {output_name} output that patie...     0.000000            3        12.666667
+What was the name of the specimen that patient {patient_id} ...     0.000000            7         1.000000
+What was the organism name found in the [time_filter_exact1]...     0.000000            6         3.333333
+What was the total amount of dose of {drug_name} that patien...     0.000000            7         2.571429
+What was the total volume of output that patient {patient_id...     0.000000            4       131.500000
+What was the [time_filter_exact1] length of ICU stay of pati...     0.000000            7         1.000000
+When was the [time_filter_exact1] hospital discharge time of...     0.000000            7         1.000000
+When was the [time_filter_exact1] microbiology test of patie...     0.000000            6         1.000000
+When was the [time_filter_exact1] procedure time of patient ...     0.000000            6         1.000000
+What was the [time_filter_exact1] length of hospital stay of...     0.000000            7         1.000000
+Count the number of ICU visits of patient {patient_id} [time...     0.000000            7         1.285714
+What was the [time_filter_exact1] hospital admission type of...     0.000000            7         1.000000
+Has_verb the {vital_name} of patient {patient_id} been ever ...     0.000000            2         5.000000
+Count the number of hospital visits of patient {patient_id} ...     0.000000            7         1.285714
+Has_verb patient {patient_id} been admitted to the hospital ...     0.000000            4         3.000000
+Has_verb patient {patient_id} been prescribed {drug_name1}, ...     0.000000            4        10.500000
+Has_verb patient {patient_id} been to an emergency room [tim...     0.000000            7         1.000000
+Has_verb patient {patient_id} received any diagnosis [time_f...     0.000000            4        15.000000
+Has_verb patient {patient_id} received any lab test [time_fi...     0.000000            5       225.200000
+Has_verb patient {patient_id} received any procedure [time_f...     0.000000            6         5.333333
+Is the value of {lab_name} of patient {patient_id} [time_fil...     0.000000            6         2.000000
+What was the [time_filter_exact1] careunit of patient {patie...     0.000000            7         1.000000
+Is the {vital_name} of patient {patient_id} [time_filter_exa...     0.000000            6         2.000000
+List the [unit_average] [agg_function] weight of patient {pa...     0.000000            6         3.666667
+What is the change in the value of {lab_name} of patient {pa...     0.000000            4         2.000000
+What is the change in the weight of patient {patient_id} fro...     0.000000            7         2.000000
+What is the change in the {vital_name} of patient {patient_i...     0.000000            5         2.000000
+Count the number of drugs patient {patient_id} were prescrib...     0.000000            6       123.666667
+What was the [agg_function] {vital_name} of patient {patient...     0.000000            2        19.500000
+When was the [time_filter_exact1] time that the {vital_name}...     0.000000            6         1.000000
+
+=== Top 5 best handled ===
+                                                                 mean_recall  n_questions  mean_n_true_ids
+template                                                                                                  
+Count the number of times that patient {patient_id} received...     1.000000            4         1.000000
+Has_verb patient {patient_id} received a {procedure_name} pr...     1.000000            7         1.142857
+Has_verb patient {patient_id} had any {spec_name} microbiolo...     0.750000            4         9.250000
+What is the gender of patient {patient_id}?                         0.714286            7         1.000000
+Has_verb patient {patient_id} received a {lab_name} lab test...     0.500000            6         3.000000
+
+=== Top 5 worst handled ===
+                                                                 mean_recall  n_questions  mean_n_true_ids
+template                                                                                                  
+What is the change in the weight of patient {patient_id} fro...          0.0            7         2.000000
+What is the change in the {vital_name} of patient {patient_i...          0.0            5         2.000000
+Count the number of drugs patient {patient_id} were prescrib...          0.0            6       123.666667
+What was the [agg_function] {vital_name} of patient {patient...          0.0            2        19.500000
+When was the [time_filter_exact1] time that the {vital_name}...          0.0            6         1.000000

@@ -1,0 +1,29 @@
+# Data & credentials
+data/*.json
+data/*.csv
+data/*.ndjson
+data/fhir_records/
+data/fhir_store.db
+data/counsel-auth.json
+
+# Environment
+.env
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Output
+output_eval/
+data/eval_results/
+data/_physionet_raw/
+data/_fhir_agentbench/
+*.log
